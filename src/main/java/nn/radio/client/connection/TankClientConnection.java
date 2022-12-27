@@ -1,91 +1,62 @@
 package nn.radio.client.connection;
 
-import nn.radio.client.KeyEventListener;
-import nn.radio.client.MouseClickedListener;
 import nn.radio.client.TankListener;
-import nn.radio.dto.KeyEventDto;
-import nn.radio.dto.MouseEventDto;
 import nn.radio.dto.TankDto;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
 public class TankClientConnection extends Thread {
-    private static final int TANK_IN_PORT = 4446;
-    Socket clientSocket;
-    ServerSocket serverSocket;
-    Socket socket;
-    ObjectOutputStream objectOutputStreamSender;
     ObjectInputStream reciever;
-    private boolean isAlive;
-    private TankListener tankListener;
-    private boolean isConnected = false;
-    private boolean isClientConnected = false;
+    private boolean isAlive = true;
+    private TankListener tankListener = null;
     private boolean isServerConnected = false;
 
     public TankClientConnection (){
         System.out.println("TankClientConnection");
         isAlive = true;
     }
-
-    private void startServerSocket () {
-        while (!isServerConnected) {
-            try {
-                System.out.println("TankClientConnection startServerSocket " + TANK_IN_PORT);
-                serverSocket = new ServerSocket(TANK_IN_PORT);
-            } catch (Exception e) {
-                System.out.println("TankClientConnection startServerSocket error");
-            }
-
-            try {
-                socket = serverSocket.accept();
-            } catch (Exception e) {
-                System.out.println("TankClientConnection" +
-                        "TankClientConnection serverSocket.accept() error");
-            }
-
-            try {
-                reciever = new ObjectInputStream(socket.getInputStream());
-                isServerConnected = true;
-            } catch (IOException e) {
-                System.out.println("TankClientConnection" +
-                        "TankClientConnection ObjectInputStream error");
-            }
-
-            try {
-                sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+    public void setReciever (ObjectInputStream reciever){
+        System.out.println("TankClientConnection");
+        isAlive = true;
+        this.reciever = reciever;
     }
+
+
 
     @Override
     public void run(){
-            System.out.println("TankClientConnection" +
-                    "TankClientConnection run");
-            startServerSocket();
-            System.out.println("TankClientConnection" +
-                    "TankClientConnection startServerSocket");
 
         while (isAlive){
             try {
-                Map<String, TankDto> map = (HashMap<String, TankDto>) reciever.readObject();
-                tankListener.updateTankMapWithDto(map);
-                continue;
+                System.out.println("TankClientConnection run");
+                if(reciever != null && tankListener != null) {
+                    Map<String, TankDto> map = (HashMap<String, TankDto>) reciever.readObject();
+                    tankListener.updateTankMapWithDto(map);
+                }
             } catch (Exception ioException) {
-                System.out.println("TankClientConnection" +
-                        "TankClientConnection updateTankMapWithDto error");
+                System.out.println("TankClientConnection updateTankMapWithDto error");
             }
         }
+
+        try {
+            if(reciever != null) {
+                reciever.close();
+            }
+            System.out.println("TankClientConnection close");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("TankClientConnection run end");
     }
 
     public void setTankListener(TankListener listener){
         this.tankListener = listener;
+    }
+
+    public void stopConnection(){
+        isAlive = false;
     }
 }

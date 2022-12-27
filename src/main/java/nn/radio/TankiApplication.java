@@ -1,6 +1,7 @@
 package nn.radio;
 
 import nn.radio.client.connection.EventClientConnection;
+import nn.radio.client.connection.FullClientConnection;
 import nn.radio.client.connection.TankClientConnection;
 import nn.radio.client.view.Scena;
 
@@ -16,13 +17,12 @@ public class TankiApplication {
         GraphicsDevice[] gs = ge.getScreenDevices();
         GraphicsDevice gd0 = gs[0];
 
-        TankClientConnection tankClientConnection = new TankClientConnection();
-        EventClientConnection eventClientConnection = new EventClientConnection();
+        FullClientConnection fullClientConnection = new FullClientConnection();
         Scena scena0 = new Scena();
 
-        tankClientConnection.setTankListener(scena0);
-        scena0.setKeyEventListener(eventClientConnection);
-        scena0.setMouseClickedListener(eventClientConnection);
+        fullClientConnection.setTankListener(scena0);
+        scena0.setKeyEventListener(fullClientConnection.eventClientConnection);
+        scena0.setMouseClickedListener(fullClientConnection.eventClientConnection);
 
 
         JFrame frame0 = new JFrame(gd0.getDefaultConfiguration());
@@ -33,7 +33,6 @@ public class TankiApplication {
         frame0.setResizable(true);
         frame0.add(scena0);
         frame0.setVisible(true);
-        eventClientConnection.start();
-        tankClientConnection.start();
+        fullClientConnection.start();
     }
 }

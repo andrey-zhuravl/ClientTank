@@ -48,7 +48,6 @@ public class ClientTorre {
     }
 
     public void drawCharges(Graphics g){
-        System.out.println("chargeMap=" + chargeMap);
         chargeMap.values().forEach(clientCharge -> {
             clientCharge.draw(g, chargeMap.values());
         });

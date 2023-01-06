@@ -1,19 +1,18 @@
 package nn.radio.client.connection;
 
-import nn.radio.client.KeyEventListener;
-import nn.radio.client.MouseClickedListener;
+import nn.radio.dto.AuthDto;
 import nn.radio.dto.KeyEventDto;
 import nn.radio.dto.MouseEventDto;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-public class EventClientConnection implements KeyEventListener,
-        MouseClickedListener {
+public class EventClientConnection {
     ObjectOutputStream objectOutputStreamSender = null;
+    private ObjectInputStream eventObjectInutStreamReceiver = null;
 
     public EventClientConnection (){
-
     }
 
     public void setObjectOutputStreamSender (ObjectOutputStream objectOutputStreamSender) {
@@ -21,7 +20,24 @@ public class EventClientConnection implements KeyEventListener,
         this.objectOutputStreamSender = objectOutputStreamSender;
     }
 
-    @Override
+    public void setEventObjectInutStreamReceiver (ObjectInputStream eventObjectInutStreamReceiver) {
+        System.out.println("EventClientConnection");
+        this.eventObjectInutStreamReceiver = eventObjectInutStreamReceiver;
+    }
+
+    public void authSend (AuthDto e) {
+        if (objectOutputStreamSender != null) {
+            try {
+                objectOutputStreamSender.writeObject(e);
+                AuthDto e1 = (AuthDto) eventObjectInutStreamReceiver.readObject();
+                System.out.println(e1.id + " " + e1.pwd);
+            } catch (Exception ioException) {
+                ioException.printStackTrace();
+                throw new RuntimeException("Can't send authantication");
+            }
+        }
+    }
+
     public void keyPressed (KeyEventDto e) {
         if (objectOutputStreamSender != null) {
             try {
@@ -32,7 +48,6 @@ public class EventClientConnection implements KeyEventListener,
         }
     }
 
-    @Override
     public void keyReleased (KeyEventDto e) {
         if (objectOutputStreamSender != null) {
             try {
@@ -43,7 +58,6 @@ public class EventClientConnection implements KeyEventListener,
         }
     }
 
-    @Override
     public void mouseClicked (MouseEventDto e) {
         if (objectOutputStreamSender != null) {
             try {

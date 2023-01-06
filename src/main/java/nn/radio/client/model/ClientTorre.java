@@ -1,5 +1,7 @@
 package nn.radio.client.model;
 
+import nn.radio.client.view.Scena;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -30,8 +32,8 @@ public class ClientTorre {
         this.Y = y;
 
         setFocusable(false);
-        URL imgURLActive = getClass().getResource("/torre1.png");
-        URL imgURLNonActive = getClass().getResource("/torreNotActive.png");
+        URL imgURLActive = getClass().getResource("/images/torre1.png");
+        URL imgURLNonActive = getClass().getResource("/images/torreNotActive.png");
         try {
             imgActive = ImageIO.read(imgURLActive);
             imgNonActive = ImageIO.read(imgURLNonActive);
@@ -47,9 +49,9 @@ public class ClientTorre {
         g2d.rotate(Math.toRadians(-(alpha)), (X + TORRE_HEIGHT/4), (Y + TORRE_WIDTH/2));
     }
 
-    public void drawCharges(Graphics g){
+    public void drawCharges (Graphics g){
         chargeMap.values().forEach(clientCharge -> {
-            clientCharge.draw(g, chargeMap.values());
+            clientCharge.draw(g, TORRE_WIDTH);
         });
     }
 

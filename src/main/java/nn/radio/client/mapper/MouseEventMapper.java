@@ -6,10 +6,11 @@ import java.awt.event.MouseEvent;
 
 public class MouseEventMapper {
 
-    public static MouseEventDto fromMouseEvent(MouseEvent e){
+    public static MouseEventDto fromMouseEvent(MouseEvent e, String userId){
         MouseEventDto dto = new MouseEventDto();
         dto.x = e.getX();
         dto.y = e.getY();
+        dto.userId = userId;
         return dto;
     }
 }

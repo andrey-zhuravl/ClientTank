@@ -1,6 +1,6 @@
 package nn.radio.client.connection;
 
-import nn.radio.client.TankListener;
+import nn.radio.client.listener.TankListener;
 import nn.radio.dto.TankDto;
 
 import java.io.IOException;
@@ -15,8 +15,6 @@ public class TankClientConnection extends Thread {
     private boolean isServerConnected = false;
 
     public TankClientConnection (){
-        System.out.println("TankClientConnection");
-        isAlive = true;
     }
     public void setReciever (ObjectInputStream reciever){
         System.out.println("TankClientConnection");
@@ -28,10 +26,8 @@ public class TankClientConnection extends Thread {
 
     @Override
     public void run(){
-
         while (isAlive){
             try {
-                System.out.println("TankClientConnection run");
                 if(reciever != null && tankListener != null) {
                     Map<String, TankDto> map = (HashMap<String, TankDto>) reciever.readObject();
                     tankListener.updateTankMapWithDto(map);

@@ -1,6 +1,12 @@
 package nn.radio.client.connection;
 
-import nn.radio.client.TankListener;
+import nn.radio.TankiProperty;
+import nn.radio.client.listener.KeyEventListener;
+import nn.radio.client.listener.MouseClickedListener;
+import nn.radio.client.listener.TankListener;
+import nn.radio.dto.AuthDto;
+import nn.radio.dto.KeyEventDto;
+import nn.radio.dto.MouseEventDto;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -8,36 +14,39 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 
-public class FullClientConnection extends Thread {
-    private static final int KEY_EVENT_OUT_PORT = 14472;
-    private static final int TANK_IN_PORT = 14473;
+public class FullClientConnection extends Thread implements KeyEventListener,
+        MouseClickedListener {
     private static final String IP = "192.168.1.10";
     private static final String LOCAL_IP = "127.0.0.1";
-    public EventClientConnection eventClientConnection  = new EventClientConnection();
+    public EventClientConnection eventClientConnection = new EventClientConnection();
     public TankClientConnection tankClientConnection = new TankClientConnection();
     Socket eventClientSocket = null;
     Socket tankClientSocket = null;
     private boolean isConnected = false;
     private boolean isTankConnected = false;
     private boolean isEventConnected = false;
-    private ObjectOutputStream objectOutputStreamSender;
+    private ObjectOutputStream eventObjectOutputStreamSender;
+    private ObjectInputStream eventObjectInutStreamReceiver;
+    TankiProperty property;
 
-    public FullClientConnection (){
+    public FullClientConnection (TankiProperty property) {
+        this.property = property;
     }
 
-    private void startConnection(){
+    private void startConnection () {
         while (!isConnected) {
-            System.out.println("TankClientConnection startServerSocket " + TANK_IN_PORT);
-            byte[] add= new byte[4];
-            add[0] = (byte) 192;
-            add[1] = (byte) 168;
-            add[2] = (byte) 1;
-            add[3] = (byte) 10;
+            System.out.println("TankClientConnection startServerSocket " + property.get("SERVER_PORT"));
             try {
-//                eventClientSocket = new Socket(InetAddress.getByAddress(add), KEY_EVENT_OUT_PORT);
-//                tankClientSocket = new Socket(InetAddress.getByAddress(add), TANK_IN_PORT);
-                eventClientSocket = new Socket(InetAddress.getByName(LOCAL_IP), KEY_EVENT_OUT_PORT);
-                tankClientSocket = new Socket(InetAddress.getByName(LOCAL_IP), TANK_IN_PORT);
+                InetAddress eventClientInetAddress = InetAddress.getByAddress(property.getAsByteArray("SERVER_URL"));
+                InetAddress tankClientInetAddress = InetAddress.getByAddress(property.getAsByteArray("SERVER_URL"));
+//                InetAddress eventClientInetAddress = InetAddress.getByName(property.get("SERVER_URL", "localhost"));
+//                InetAddress tankClientInetAddress = InetAddress.getByName(property.get("SERVER_URL", "localhost"));
+
+                Integer eventPort = Integer.valueOf(property.get("SERVER_EVENT_PORT", "14473"));
+                Integer tankPort = Integer.valueOf(property.get("SERVER_TANK_PORT", "14472"));
+
+                eventClientSocket = new Socket(eventClientInetAddress,eventPort);
+                tankClientSocket = new Socket(tankClientInetAddress,tankPort);
                 isConnected = true;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -48,11 +57,13 @@ public class FullClientConnection extends Thread {
     private void creatEventConnection () {
         while (!isEventConnected) {
             try {
-                System.out.println("TankClientConnection startServerSocket clientSocket" + eventClientSocket == null);
-                objectOutputStreamSender = new ObjectOutputStream(eventClientSocket.getOutputStream());
+                System.out.println("EventClientConnection startServerSocket clientSocket" + eventClientSocket == null);
+                eventObjectOutputStreamSender = new ObjectOutputStream(eventClientSocket.getOutputStream());
+                eventObjectInutStreamReceiver = new ObjectInputStream(eventClientSocket.getInputStream());
                 isEventConnected = true;
-                System.out.println("TankClientConnection startServerSocket reciever");
-                eventClientConnection.setObjectOutputStreamSender(objectOutputStreamSender);
+                System.out.println("EventClientConnection objectOutputStreamSender");
+                eventClientConnection.setObjectOutputStreamSender(eventObjectOutputStreamSender);
+                eventClientConnection.setEventObjectInutStreamReceiver(eventObjectInutStreamReceiver);
             } catch (IOException e) {
                 System.out.println("TankClientConnection ObjectInputStream error");
             }
@@ -75,14 +86,35 @@ public class FullClientConnection extends Thread {
     }
 
     @Override
-    public void run(){
+    public void run () {
         startConnection();
         creatEventConnection();
         createTankConnection();
         System.out.println("TankClientConnection run end");
+        AuthDto authDto = new AuthDto(property.get("USER_ID"), property.get("USER_PWD"));
+        authSend(authDto);
     }
 
-    public void setTankListener(TankListener listener){
+    public void setTankListener (TankListener listener) {
         this.tankClientConnection.setTankListener(listener);
+    }
+
+    public void authSend(AuthDto dto){
+        eventClientConnection.authSend(dto);
+    }
+
+    @Override
+    public void keyPressed (KeyEventDto e) {
+        eventClientConnection.keyPressed(e);
+    }
+
+    @Override
+    public void keyReleased (KeyEventDto e) {
+        eventClientConnection.keyReleased(e);
+    }
+
+    @Override
+    public void mouseClicked (MouseEventDto e) {
+        eventClientConnection.mouseClicked(e);
     }
 }

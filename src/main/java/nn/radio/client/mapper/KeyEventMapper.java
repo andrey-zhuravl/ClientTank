@@ -6,16 +6,18 @@ import java.awt.event.KeyEvent;
 
 public class KeyEventMapper {
 
-    public static KeyEventDto fromKeyPressedEvent(KeyEvent e){
+    public static KeyEventDto fromKeyPressedEvent(KeyEvent e, String userId){
         KeyEventDto dto = new KeyEventDto();
         dto.setKeyCode(e.getKeyCode());
+        dto.userId = userId;
         dto.paramString = "KEY_PRESSED";
         return dto;
     }
 
-    public static KeyEventDto fromKeyReleasedEvent(KeyEvent e){
+    public static KeyEventDto fromKeyReleasedEvent(KeyEvent e, String userId){
         KeyEventDto dto = new KeyEventDto();
         dto.setKeyCode(e.getKeyCode());
+        dto.userId = userId;
         dto.paramString = "KEY_RELEASED";
         return dto;
     }

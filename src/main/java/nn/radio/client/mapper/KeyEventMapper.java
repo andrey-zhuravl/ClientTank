@@ -11,6 +11,7 @@ public class KeyEventMapper {
         dto.setKeyCode(e.getKeyCode());
         dto.userId = userId;
         dto.paramString = "KEY_PRESSED";
+        dto.time = System.nanoTime();
         return dto;
     }
 
@@ -19,6 +20,7 @@ public class KeyEventMapper {
         dto.setKeyCode(e.getKeyCode());
         dto.userId = userId;
         dto.paramString = "KEY_RELEASED";
+        dto.time = System.nanoTime();
         return dto;
     }
 }

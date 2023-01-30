@@ -42,6 +42,7 @@ public class EventClientConnection {
         if (objectOutputStreamSender != null) {
             try {
                 objectOutputStreamSender.writeObject(e);
+                objectOutputStreamSender.flush();
             } catch (IOException ioException) {
                 ioException.printStackTrace();
             }
@@ -52,6 +53,7 @@ public class EventClientConnection {
         if (objectOutputStreamSender != null) {
             try {
                 objectOutputStreamSender.writeObject(e);
+                objectOutputStreamSender.flush();
             } catch (IOException ioException) {
                 ioException.printStackTrace();
             }
@@ -62,6 +64,7 @@ public class EventClientConnection {
         if (objectOutputStreamSender != null) {
             try {
                 objectOutputStreamSender.writeObject(e);
+                objectOutputStreamSender.flush();
             } catch (IOException ioException) {
                 ioException.printStackTrace();
             }

@@ -11,6 +11,7 @@ public class MouseEventMapper {
         dto.x = e.getX();
         dto.y = e.getY();
         dto.userId = userId;
+        dto.time = System.nanoTime();
         return dto;
     }
 }

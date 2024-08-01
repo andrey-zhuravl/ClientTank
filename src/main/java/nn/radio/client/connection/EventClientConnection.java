@@ -17,7 +17,7 @@ import java.util.Map;
 
 public class EventClientConnection extends Thread implements KeyEventListener,
                                                         MouseClickedListener{
-    private static final int KEY_EVENT_OUT_PORT = 4447;
+    private static final int KEY_EVENT_OUT_PORT = 4447;sdf
     Socket clientSocket;
     ServerSocket serverSocket;
     Socket socket;
